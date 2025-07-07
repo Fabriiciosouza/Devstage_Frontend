@@ -1,41 +1,73 @@
-# Deployment e Service do Frontend
-# Gerencia a implantação e exposição do meu frontend.
+# Arquivo de configuração Kubernetes para o Frontend
+# Este arquivo define tanto o Deployment quanto o Service para a aplicação frontend
+# Permite que o frontend seja executado e acessado dentro do cluster Kubernetes
 
-# Deployment do Frontend: 1 pod
+# ============================================================================
+# DEPLOYMENT: Gerencia a criação e manutenção dos pods do frontend
+# ============================================================================
+
+# Versão da API do Kubernetes para recursos de aplicação
 apiVersion: apps/v1
+# Tipo de recurso: Deployment (gerencia réplicas de pods)
 kind: Deployment
+# Metadados do deployment
 metadata:
-  name: frontend
+  name: frontend # Nome único do deployment no cluster
 spec:
-  replicas: 1 # 1 instância do frontend
+  replicas: 1 # Número de instâncias (pods) do frontend que devem estar rodando
+
+  # Seletor que define quais pods este deployment deve gerenciar
   selector:
     matchLabels:
-      app: frontend
+      app: frontend # Busca pods com a label "app: frontend"
+
+  # Template que define como os pods serão criados
   template:
     metadata:
       labels:
-        app: frontend
+        app: frontend # Label aplicada aos pods criados (deve coincidir com o selector)
+
+    # Especificação dos containers dentro do pod
     spec:
       containers:
-        - name: frontend
+        - name: frontend # Nome do container
+          # Imagem Docker que será executada (do Docker Hub)
           image: fafa014/devstage_frontend:latest
+
+          # Portas que o container expõe
           ports:
-            - containerPort: 3000
+            - containerPort: 3000 # Porta onde a aplicação React roda dentro do container
+
+          # Variáveis de ambiente para configurar a aplicação
           env:
-            - name: REACT_APP_API # URL do backend que o frontend usará
-              value: "http://localhost:5000" # Mapeado pelo Kind
+            # URL da API backend que o frontend irá consumir
+            - name: REACT_APP_API
+              value: "http://localhost:5000" # Endereço do backend (mapeado pelo Kind)
+
 ---
-# Service do Frontend: Expõe o frontend
+# ============================================================================
+# SERVICE: Expõe o frontend para acesso interno e externo
+# ============================================================================
+
+# Versão da API do Kubernetes para recursos de rede
 apiVersion: v1
+# Tipo de recurso: Service (expõe pods na rede)
 kind: Service
+# Metadados do service
 metadata:
-  name: frontend-service
+  name: frontend-service # Nome único do service no cluster
+# Especificação do service
 spec:
+  # Seletor que define quais pods este service deve expor
   selector:
-    app: frontend
+    app: frontend # Direciona tráfego para pods com a label "app: frontend"
+
+  # Configuração das portas do service
   ports:
-    - protocol: TCP
-      port: 3000
-      targetPort: 3000
-      nodePort: 30000 # NodePort para acesso externo (mapeado pelo Kind)
-  type: NodePort
+    - protocol: TCP # Protocolo de comunicação
+      port: 3000 # Porta que o service expõe internamente no cluster
+      targetPort: 3000 # Porta do container para onde o tráfego será direcionado
+      nodePort: 30000 # Porta externa do nó para acesso fora do cluster
+
+  # Tipo de service: NodePort permite acesso externo através de uma porta específica
+  type: NodePort # Expõe o service em uma porta estática em cada nó do cluster

@@ -1,34 +1,44 @@
+# Nome do workflow que aparece na interface do GitHub Actions
 name: Build and Push to Docker Hub
 
+# Define quando o workflow será executado
 on:
   push:
-    branches: ["main"]
+    branches: ["main"] # Executa apenas quando há push para a branch main
 
+# Variáveis de ambiente que podem ser reutilizadas em todo o workflow
 env:
-  DOCKERHUB_REPO: fafa014/devstage_frontend
+  DOCKERHUB_REPO: fafa014/devstage_frontend # Nome do repositório no Docker Hub
 
+# Define os jobs (trabalhos) que serão executados
 jobs:
+  # Job chamado "docker" que constrói e publica a imagem Docker
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Especifica o sistema operacional do runner
 
+    # Lista de passos que serão executados sequencialmente
     steps:
+      # Passo 1: Fazer checkout do código do repositório
       - name: Checkout code
-        uses: actions/checkout@v4 # Versão atualizada
+        uses: actions/checkout@v4 # Action oficial do GitHub para baixar o código
 
+      # Passo 2: Fazer login no Docker Hub usando credenciais seguras
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v2 # Action oficial para login no Docker Hub
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # Username armazenado nos secrets do GitHub
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # Token de acesso armazenado nos secrets
 
+      # Passo 3: Configurar o Docker Buildx para builds avançados
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v2 # Permite builds multi-plataforma e cache
 
+      # Passo 4: Construir e fazer push da imagem Docker
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v4 # Action para build e push da imagem
         with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.DOCKERHUB_REPO }}:latest
-            ${{ env.DOCKERHUB_REPO }}:${{ github.sha }}
+          context: . # Usa o diretório atual como contexto do build
+          push: true # Faz push da imagem para o Docker Hub
+          tags: | # Define as tags para a imagem
+            ${{ env.DOCKERHUB_REPO }}:latest        # Tag "latest" para a versão mais recente
+            ${{ env.DOCKERHUB_REPO }}:${{ github.sha }} # Tag com o hash do commit para versionamento

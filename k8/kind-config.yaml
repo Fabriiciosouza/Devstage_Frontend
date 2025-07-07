@@ -1,11 +1,23 @@
-# Configuração do Cluster Kind
-# Define como o cluster Kind mapeia portas do Kubernetes para meu localhost.
+# Configuração do Cluster Kind (Kubernetes in Docker)
+# Este arquivo define como criar um cluster Kubernetes local usando Kind
+# Kind permite executar Kubernetes em containers Docker para desenvolvimento e testes
+
+# Especifica o tipo de recurso Kubernetes que está sendo definido
 kind: Cluster
+
+# Versão da API do Kind para esta configuração
 apiVersion: kind.x-k8s.io/v1alpha4
+
+# Lista de nós (nodes) que compõem o cluster
 nodes:
+  # Define um nó com papel de control-plane (master)
   - role: control-plane
+
+    # Configurações adicionais de mapeamento de portas
     extraPortMappings:
-      # Frontend: NodePort 30000 -> localhost:3000 (para acesso no navegador)
-      - containerPort: 30000
-        hostPort: 3000
-        protocol: TCP
+      # Mapeia a porta 30000 do container (NodePort do Kubernetes)
+      # para a porta 3000 do host (localhost)
+      # Isso permite acessar o frontend da aplicação em http://localhost:3000
+      - containerPort: 30000 # Porta dentro do cluster Kind
+        hostPort: 3000 # Porta no seu computador local
+        protocol: TCP # Protocolo de comunicação utilizado
