@@ -39,6 +39,7 @@ jobs:
         with:
           context: . # Usa o diretório atual como contexto do build
           push: true # Faz push da imagem para o Docker Hub
-          tags: | # Define as tags para a imagem
-            ${{ env.DOCKERHUB_REPO }}:latest        # Tag "latest" para a versão mais recente
-            ${{ env.DOCKERHUB_REPO }}:${{ github.sha }} # Tag com o hash do commit para versionamento
+          # Define as tags para a imagem
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}:latest
+            ${{ env.DOCKERHUB_REPO }}:${{ github.sha }}
