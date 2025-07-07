@@ -18,13 +18,13 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: giovanamori/devstage-frontend:latest
+          image: fafa014/devstage_frontend:latest
           ports:
             - containerPort: 3000
           env:
             - name: REACT_APP_API # URL do backend que o frontend usará
               value: "http://localhost:5000" # Mapeado pelo Kind
---- 
+---
 # Service do Frontend: Expõe o frontend
 apiVersion: v1
 kind: Service
